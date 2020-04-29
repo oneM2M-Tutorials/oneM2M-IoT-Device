@@ -26,6 +26,7 @@ int TY_AE  = 2;
 int TY_CNT = 3; 
 int TY_CI  = 4;
 int TY_SUB = 23;
+String originator = "Undefined";
 
 // HTTP constants
 int LOCAL_PORT = 80;
@@ -60,7 +61,7 @@ String command = "";        // The received command
 // param : url  --> the url path of the targted oneM2M resource on the remote CSE
 // param : ty --> content-type being sent over this POST request (2 for ae, 3 for cnt, etc.)
 // param : rep  --> the representaton of the resource in JSON format
-String doPOST(String url, String originator, int ty, String rep) {
+String doPOST(String url, String originator1, int ty, String rep) {
 
   String relHeader = "";
   if (CSE_RELEASE != "1") {
@@ -140,7 +141,7 @@ String createAE(String ae) {
 #ifdef DEBUG
   Serial.println(aeRepresentation);
 #endif
-  return doPOST("/" + CSE_NAME, "Cae-"+ae, TY_AE, aeRepresentation);
+  return doPOST("/" + CSE_NAME, originator, TY_AE, aeRepresentation);
 }
 
 // Method for creating an Access Control Policy(ACP) resource on the remote CSE under a specific AE (this is done by sending a POST request)
@@ -153,7 +154,7 @@ String createACP(String ae, String acp) {
 	"\"pv\":{\"acr\":[{\"acor\":[\"all\"],\"acop\":63}]},"
 	"\"pvs\":{\"acr\":[{\"acor\":[\"all\"],\"acop\":63}]}"
 	"}}";
-  return doPOST("/" + CSE_NAME + "/" + ae, "Cae-"+ae, TY_ACP, acpRepresentation);
+  return doPOST("/" + CSE_NAME + "/" + ae, originator, TY_ACP, acpRepresentation);
 }
 
 // Method for creating an Container(CNT) resource on the remote CSE under a specific AE (this is done by sending a POST request)
@@ -166,7 +167,7 @@ String createCNT(String ae, String cnt) {
     "\"rn\":\"" + cnt + "\"" +
 	  ACPID + //IF ACP created, it is associated to the container so that anyone has access 
     "}}";
-  return doPOST("/" + CSE_NAME + "/" + ae, "Cae-"+ae, TY_CNT, cntRepresentation);
+  return doPOST("/" + CSE_NAME + "/" + ae, originator, TY_CNT, cntRepresentation);
 }
 
 // Method for creating an ContentInstance(CI) resource on the remote CSE under a specific CNT (this is done by sending a POST request)
@@ -178,7 +179,7 @@ String createCI(String ae, String cnt, String ciContent) {
     "{\"m2m:cin\": {"
     "\"con\":\"" + ciContent + "\""
     "}}";
-  return doPOST("/" + CSE_NAME + "/" + ae + "/" + cnt, "Cae-"+ae,  TY_CI, ciRepresentation);
+  return doPOST("/" + CSE_NAME + "/" + ae + "/" + cnt, originator,  TY_CI, ciRepresentation);
 }
 
 
@@ -193,7 +194,7 @@ String createSUB(String ae) {
     "\"nct\":2,"
     "\"enc\":{\"net\":[3]}"
     "}}";
-  return doPOST("/" + CSE_NAME + "/" + ae + "/" + CMND_CNT_NAME, "Cae-"+ae,  TY_SUB, subRepresentation);
+  return doPOST("/" + CSE_NAME + "/" + ae + "/" + CMND_CNT_NAME, originator,  TY_SUB, subRepresentation);
 }
 
 
@@ -358,6 +359,7 @@ void init_tilt() {
                               "Unit = Bool\t"
                               "Location = MainDoor\t";
   String initialData = "0";
+  originator = "Cae-TiltSensor";
   registerModule("TiltSensor", false, initialDescription, initialData);
 }
 void task_tilt() {
@@ -371,6 +373,7 @@ void task_tilt() {
   delay(100);
   #endif
   ciContent = sensorValue;
+  originator = "Cae-TiltSensor";
   createCI("TiltSensor", DATA_CNT_NAME, ciContent);
 }
 void command_tilt(String cmd) {
@@ -380,10 +383,12 @@ void init_led() {
   String initialDescription = "Name = LedActuator\t"
                               "Location = Home\t";
   String initialData = "switchOff";
+  originator = "Cae-LedActuator";
   registerModule("LedActuator", true, initialDescription, initialData);
 }
-void task_led() {
-
+void task_led(String cmd) {
+  originator = "Cae-LedActuator";
+  createCI("LedActuator", DATA_CNT_NAME, cmd);  
 }
 void command_led(String cmd) {
   if (cmd == "switchOn") {
@@ -430,6 +435,7 @@ void loop() {
     if (context != "") {
       if (context == "LedActuator") {
         command_led(command);
+		task_led(command);
       }
       else
         Serial.println("The targte AE does not exist ! ");
