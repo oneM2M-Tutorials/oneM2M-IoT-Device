@@ -205,14 +205,14 @@ void registerModule(String module, bool isActuator, String intialDescription, St
 	
     // 1. Create the ApplicationEntity (AE) for this sensor
     result = createAE(module);
-    if (result.equalsIgnoreCase(HTTP_CREATED) {
+    if (result.equalsIgnoreCase(HTTP_CREATED)) {
       #ifdef DEBUG
       Serial.println("AE " + module + " created  !");
       #endif
 	    // 1.1 Create the AccessControlPolicy (ACP) for this sensor so that monitor can subscribe to it
 	    if(ACP_REQUIRED) {
 		    result = createACP(module, ACP_NAME);
-		    if (result.equalsIgnoreCase(HTTP_CREATED) {
+		    if (result.equalsIgnoreCase(HTTP_CREATED)) {
 			    ACPID = ",\"acpi\":[\"" + CSE_NAME + "/" + module + "/" + ACP_NAME + "\"]";
           #ifdef DEBUG
 			      Serial.println("ACP " + module + " created  !");
@@ -221,13 +221,13 @@ void registerModule(String module, bool isActuator, String intialDescription, St
 	    }
       // 2. Create a first container (CNT) to store the description(s) of the sensor
       result = createCNT(module, DESC_CNT_NAME);
-      if (result.equalsIgnoreCase(HTTP_CREATED) {
+      if (result.equalsIgnoreCase(HTTP_CREATED)) {
         #ifdef DEBUG
         Serial.println("CNT " + module + "/" + DESC_CNT_NAME + " created  !");
         #endif
         // Create a first description under this container in the form of a ContentInstance (CI)
         result = createCI(module, DESC_CNT_NAME, intialDescription);
-        if (result.equalsIgnoreCase(HTTP_CREATED) {
+        if (result.equalsIgnoreCase(HTTP_CREATED)) {
           #ifdef DEBUG
           Serial.println("CI " + module + "/" + DESC_CNT_NAME + "/{initial_description} created !");
           #endif
@@ -235,13 +235,13 @@ void registerModule(String module, bool isActuator, String intialDescription, St
       }
       // 3. Create a second container (CNT) to store the data  of the sensor
       result = createCNT(module, DATA_CNT_NAME);
-      if (result.equalsIgnoreCase(HTTP_CREATED) {
+      if (result.equalsIgnoreCase(HTTP_CREATED)) {
         #ifdef DEBUG
         Serial.println("CNT " + module + "/" + DATA_CNT_NAME + " created !");
         #endif
         // Create a first data value under this container in the form of a ContentInstance (CI)
         result = createCI(module, DATA_CNT_NAME, initialData);
-        if (result.equalsIgnoreCase(HTTP_CREATED) {
+        if (result.equalsIgnoreCase(HTTP_CREATED)) {
           #ifdef DEBUG
           Serial.println("CI " + module + "/" + DATA_CNT_NAME + "/{initial_data} created !");
           #endif
@@ -251,13 +251,13 @@ void registerModule(String module, bool isActuator, String intialDescription, St
       // 4. if the module is an actuator, create a third container (CNT) to store the received commands
       if (isActuator) {
         result = createCNT(module, CMND_CNT_NAME);
-        if (result.equalsIgnoreCase(HTTP_CREATED) {
+        if (result.equalsIgnoreCase(HTTP_CREATED)) {
           #ifdef DEBUG
           Serial.println("CNT " + module + "/" + CMND_CNT_NAME + " created !");
           #endif
           // subscribe to any command put in this container
           result = createSUB(module);
-          if (result.equalsIgnoreCase(HTTP_CREATED) {
+          if (result.equalsIgnoreCase(HTTP_CREATED)) {
             #ifdef DEBUG
             Serial.println("SUB " + module + "/" + CMND_CNT_NAME + "/SUB_" + module + " created !");
             #endif
@@ -447,5 +447,4 @@ void loop() {
   }
   currentMillis = millis();
   task_tilt();
-
 }
