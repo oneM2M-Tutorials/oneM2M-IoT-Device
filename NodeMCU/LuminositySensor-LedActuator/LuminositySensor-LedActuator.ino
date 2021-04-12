@@ -132,7 +132,7 @@ String createAE(String ae) {
   String aeRepresentation =
     "{\"m2m:ae\": {"
     "\"rn\":\"" + ae + "\","
-    "\"api\":\"org.demo." + ae + "\","
+    "\"api\":\"Norg.demo." + ae + "\","
     "\"rr\":true,"
     "\"poa\":[\"http://" + WiFi.localIP().toString() + ":" + LOCAL_PORT + "/" + ae + "\"]" +
 	  srv +
@@ -189,7 +189,7 @@ String createSUB(String ae) {
     "{\"m2m:sub\": {"
     "\"rn\":\"SUB_" + ae + "\","
     "\"nu\":[\"" + CSE_NAME + "/" + ae  + "\"], "
-    "\"nct\":2,"
+    "\"nct\":1,"
     "\"enc\":{\"net\":[3]}"
     "}}";
   return doPOST("/" + CSE_NAME + "/" + ae + "/" + CMND_CNT_NAME, originator,  TY_SUB, subRepresentation);
@@ -359,8 +359,7 @@ void task_HTTPServer() {
 
 
 void init_luminosity() {
-  String initialDescription = "Name = LuminositySensor\t"
-                              "Location = LivingRoom\t";
+  String initialDescription = "Name = LuminositySensor Location = LivingRoom";
   String initialData = "0";
   originator = "Cae-LuminositySensor";
   registerModule("LuminositySensor", false, initialDescription, initialData);
@@ -379,15 +378,18 @@ void command_luminosity(String cmd) {
 }
 
 void init_led() {
-  String initialDescription = "Name = LedActuator\t"
-                              "Location = Home\t";
+  String initialDescription = "Name = LedActuator Location = Home";
   String initialData = "switchOff";
   originator = "Cae-LedActuator";
   registerModule("LedActuator", true, initialDescription, initialData);
 }
 void task_led(String cmd) {
   originator = "Cae-LedActuator";
-  createCI("LedActuator", DATA_CNT_NAME, cmd); 
+  if (cmd == "switchOn") {
+    createCI("LedActuator", DATA_CNT_NAME, "1");
+  } else if (cmd == "switchOff") {
+    createCI("LedActuator", DATA_CNT_NAME, "0");
+  } 
 }
 void command_led(String cmd) {
   if (cmd == "switchOn") {
