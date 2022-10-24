@@ -4,16 +4,16 @@
 
 ///////////////Parameters & Constants/////////////////
 // WIFI params
-char* WIFI_SSID = "FILL_THE_WIFI_SSID";    // Configure here the SSID of your WiFi Network
-char* WIFI_PSWD = "FILL_THE_WIFI_PSWD"; // Configure here the PassWord of your WiFi Network
+char* WIFI_SSID = "freebox_GTVJHC";    // Configure here the SSID of your WiFi Network
+char* WIFI_PSWD = "qd4kg970h91o6ut7wens"; // Configure here the PassWord of your WiFi Network
 int WIFI_DELAY  = 100; //ms
 
 // oneM2M : CSE params
-String CSE_IP      = "X.X.X.X"; //Configure here the IP Address of your oneM2M CSE
+String CSE_IP      = "192.168.0.37"; //Configure here the IP Address of your oneM2M CSE
 int   CSE_HTTP_PORT = 8080;
-String CSE_NAME    = "CseName";
-String CSE_RELEASE = "1"; //Configure here the release supported by your oneM2M CSE
-bool ACP_REQUIRED = false; //Configure here whether or not ACP is required controlling access
+String CSE_NAME    = "cse-in";
+String CSE_RELEASE = "3"; //Configure here the release supported by your oneM2M CSE
+bool ACP_REQUIRED = true; //Configure here whether or not ACP is required controlling access
 String ACPID = "";
 
 // oneM2M : resources' params
@@ -37,13 +37,13 @@ int REQUEST_NR = 0;
 
 
 //MISC
-int TLT_PIN = D2;  // Adapt it accordding to your wiring 
+int TLT_PIN = D1;  // Adapt it accordding to your wiring 
 int LED_PIN = D5;  // Adapt it accordding to your wiring. Use BUILTIN_LED for onboarded led
 #define OFF_STATE  LOW // *** External LED is active at HIGH, while Onboarded LED is active at LOW. 
 #define ON_STATE HIGH  // *** Adapat it is according to your config
 int SERIAL_SPEED  = 115200;
 
-#define DEBUG
+#define DEBUG 1
 
 ///////////////////////////////////////////
 
@@ -323,7 +323,10 @@ void task_HTTPServer() {
     start = request.indexOf("/");
     end = request.indexOf("HTTP") - 1;
     context = request.substring(start+1, end);
-    #ifdef DEBUG
+    if context.endsWith("/") {
+	  context.remove(length(context)-1,1);
+	}
+	#ifdef DEBUG
     Serial.println(String() + "context = [" + start + "," + end + "] -> " + context);
     #endif
 
@@ -366,11 +369,11 @@ void task_tilt() {
   sensorValue = digitalRead(TLT_PIN);
   //sensorValue = analogRead(TLT_PIN);
   #ifdef DEBUG
-  Serial.println("tilt value = ");
+  Serial.print("tilt value = ");
   Serial.println(sensorValue);
   delay(100);
   #endif
-  ciContent = sensorValue;
+  ciContent = String(sensorValue);
   originator = "Cae-TiltSensor";
   createCI("TiltSensor", DATA_CNT_NAME, ciContent);
 }

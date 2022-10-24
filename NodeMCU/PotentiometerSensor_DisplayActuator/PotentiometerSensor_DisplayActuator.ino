@@ -341,7 +341,10 @@ void task_HTTPServer() {
     start = request.indexOf("/");
     end = request.indexOf("HTTP") - 1;
     context = request.substring(start+1, end);
-    #ifdef DEBUG
+    if context.endsWith("/") {
+	  context.remove(length(context)-1,1);
+	}
+	#ifdef DEBUG
     Serial.println(String() + "context = [" + start + "," + end + "] -> " + context);
     #endif
 
